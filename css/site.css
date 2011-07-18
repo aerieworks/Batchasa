@@ -1,0 +1,83 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+    font-family: helvetica;
+    font-size: 14px;
+}
+
+h1 {
+    margin: 6px 4px;
+    font-size: 20px;
+    line-height: 20px;
+}
+
+h2 {
+    margin: 6px 4px;
+    font-size: 18px;
+    line-height: 18px;
+}
+
+.page {
+	display: none;
+}
+
+.selectableItem {
+    display: inline-block;
+    width: 160px;
+    padding: 10px;
+    margin: 5px;
+    border: 5px solid #fff;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    text-align: center;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.selectableItem:hover {
+    border-color: #00f;
+}
+
+.selected,
+.selected:hover {
+    border-color: #0f0;
+}
+
+.itemThumbnail {
+    display: block;
+    height: 160px;
+    width: 160px;
+}
+
+.itemSubData {
+    font-size: 80%;
+}
+
+.albumDate {
+    padding-right: 4px;
+    border-right: 1px solid #777;
+    margin-right: 4px;
+}
+
+.albumContents {
+    display: none;
+}
+
+.headerButton {
+    float: right;
+	border: none;
+    margin-left: 6px;
+	background-color: inherit;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.headerInfo {
+    float: right;
+    font-weight: normal;
+    font-size: 80%;
+}

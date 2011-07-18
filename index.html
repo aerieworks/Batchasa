@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" value="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Style-Type" value="text/css" />
+		<title>Test</title>
+		<link href="css/site.css" rel="stylesheet" content="text/css" />
+	</head>
+	<body>
+        <div id="sourceAlbumPage" class="page">
+            <h1>
+                <button type="button" class="headerButton batchasa-page-nextButton">[ Next &gt; ]</button>
+                Select Source Album
+            </h1>
+            <div id="sourceSelector"></div>
+		</div>
+
+		<div id="selectPhotosPage" class="page">
+			<h1>
+				<button type="button" class="headerButton batchasa-page-nextButton">[ Next &gt; ]</button>
+				<button type="button" class="headerButton batchasa-page-previousButton">[ &lt; Back ]</button>
+				<span id="lblSelectedCount" class="headerInfo">0 photos selected</span>
+				Select Photos to Move
+			</h1>
+            <div id="photoSelector"></div>
+        </div>
+
+        <div id="targetAlbumPage" class="page">
+            <h1>
+				<button type="button" id="btnMove" class="headerButton batchasa-page-nextButton">[ Move ]</button>
+                <button type="button" class="headerButton batchasa-page-previousButton">[ &lt; Back ]</button>
+                Select Target Album
+            </h1>
+            <div id="targetSelector"></div>
+        </div>
+		
+		<div id="resultsPage" class="page">
+			<ul id="lstResults"></ul>
+		</div>
+
+        <script type="text/javascript" src="js/jquery-1.6.1.min.js"></script>
+        <script type="text/javascript" src="js/jQuery.fn.addHidden.js"></script>
+        <script type="text/javascript" src="js/batchasa/Batchasa.js"></script>
+        <script type="text/javascript" src="js/batchasa/AuthorizationProvider.js"></script>
+        <script type="text/javascript" src="js/batchasa/PicasaService.js"></script>
+        <script type="text/javascript" src="js/batchasa/UI/Batchasa.UI.js"></script>
+        <script type="text/javascript" src="js/batchasa/UI/Page.js"></script>
+        <script type="text/javascript" src="js/batchasa/UI/AlbumSelector.js"></script>
+        <script type="text/javascript" src="js/batchasa/UI/PhotoSelector.js"></script>
+        <script type="text/javascript" src="js/authorize.js"></script>
+		<script type="text/javascript">
+			$(function() {
+                var authProvider;
+                var picasa;
+                var service;
+				var sourceAlbumPage;
+                var selectPhotosPage;
+                var targetAlbumPage;
+				var sourceSelector;
+                var photoSelector;
+                var targetSelector;
+				var lblSelectedCount;
+
+                authProvider = new Batchasa.AuthorizationProvider();
+                picasa = new Batchasa.PicasaService(authProvider);
+                service = new Batchasa.Batchasa(authProvider, picasa);
+
+				sourceAlbumPage = new Batchasa.UI.Page($('#sourceAlbumPage'));
+                selectPhotosPage = new Batchasa.UI.Page($('#selectPhotosPage'));
+                targetAlbumPage = new Batchasa.UI.Page($('#targetAlbumPage'));
+				resultsPage = new Batchasa.UI.Page($('#resultsPage'));
+				sourceAlbumPage.setNextPage(selectPhotosPage);
+				selectPhotosPage.setNextPage(targetAlbumPage);
+				targetAlbumPage.setNextPage(resultsPage);
+
+                sourceSelector = new Batchasa.UI.AlbumSelector($('#sourceSelector'));
+                sourceSelector.onSelectionChanged = function () {
+					sourceAlbumPage.setCanGoNext(sourceSelector.selectedAlbum != null);
+					photoSelector.setAlbum(sourceSelector.selectedAlbum);
+                };
+
+				lblSelectedCount = $('#lblSelectedCount');
+                photoSelector = new Batchasa.UI.PhotoSelector(service, $('#photoSelector'));
+				photoSelector.onSelectionChanged = function () {
+					var selectedCount = photoSelector.selectedPhotos.length;
+					selectPhotosPage.setCanGoNext(selectedCount > 0);
+
+					lblSelectedCount.text(selectedCount + (selectedCount == 1 ? ' photo' : ' photos') + ' selected');
+				};
+
+                targetSelector = new Batchasa.UI.AlbumSelector($('#targetSelector'));
+                targetSelector.onSelectionChanged = function() {
+					targetAlbumPage.setCanGoNext(targetSelector.selectedAlbum != null);
+                };
+
+				resultsPage.onShow = function () {
+					var data;
+
+					data = {
+						authToken: authProvider.getToken(),
+						sourceAlbumID: sourceSelector.selectedAlbum.gphoto$id.$t,
+						targetAlbumID: targetSelector.selectedAlbum.gphoto$id.$t,
+						photoIDs: []
+					};
+					$.each(photoSelector.selectedPhotos, function () {
+						data.photoIDs.push(this.gphoto$id.$t);
+					});
+
+					$.ajax({
+						url: 'move.php',
+						type: 'POST',
+						dataType: 'json',
+						data: data,
+						success: function (results) {
+							var lstResults = $('#lstResults');
+							$.each(results, function () {
+								lstResults.append($('<li />').text('Photo ' + results.photoID + ': ' + results.responseCode));
+							});
+						}
+					});
+				};
+
+				service.getUserAlbums(function (data) {
+					sourceSelector.setAlbums(data);
+					targetSelector.setAlbums(data);
+					sourceAlbumPage.show();
+				});
+			});
+		</script>
+	</body>
+</html>
