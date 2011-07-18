@@ -4,7 +4,7 @@
     // Constructor 
     function Batchasa(authorizationProvider, picasaService) {
         this.picasa = picasaService;
-        this.authToken = authorizationProvider.getToken();
+        this.authProvider = authorizationProvider;
 
     }
 

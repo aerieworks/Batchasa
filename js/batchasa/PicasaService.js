@@ -1,29 +1,25 @@
 (function($) {
-    var picasaUrlBase = 'https://picasaweb.google.com/data/feed/api/';
-    var urlParameters = '?v=2&alt=json&callback=';
-    var callbackName = '__batchasa_picasaCallback';
-    var oauthTokenParam = '&oauth_token=';
-
     // Constructor
     function PicasaService(authorizationProvider) {
-        this.token = authorizationProvider.getToken();
+        this.authProvider = authorizationProvider;
     }
 
     // Gets the specified feed from Picasa.
     function get(feed, callback) {
-        var script;
-        
-        function callbackWrapper(result) {
-            script.remove();
-            callback(result);
-        }
-        window[callbackName] = callbackWrapper;
+        var data = {
+            authToken: this.authProvider.getToken(),
+            feed: feed
+        };
 
-        script = $('<script />')
-            .attr('type', 'text/javascript')
-            .attr('src', picasaUrlBase + feed + urlParameters + callbackName +
-                oauthTokenParam + this.token);
-        $('body').append(script);
+        $.ajax({
+            url: 'gdata.php',
+            type: 'GET',
+            dataType: 'json',
+            data: data,
+            success: function (result) {
+                callback(result);
+            }
+        });
     }
 
     PicasaService.prototype = {

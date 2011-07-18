@@ -3,7 +3,8 @@
     var tokenRegEx = /^#access_token=([^&]+)/;
 
     // Constructor
-    function AuthorizationProvider() {
+    function AuthorizationProvider(theWindow) {
+        this.window = theWindow;
         this.token = null;
     }
 
@@ -14,7 +15,7 @@
 
         if (this.token == null) {
             // Get auth token and create service instance.
-            tokenMatch = tokenRegEx.exec(window.location.hash);
+            tokenMatch = tokenRegEx.exec(this.window.location.hash);
             if (tokenMatch) {
                 this.token = tokenMatch[1];
             }
@@ -25,7 +26,7 @@
 
     // Directs the user to Google's OAuth 2.0 authorization page.
     function authorize() {
-        window.location = authUrlBase + window.location;
+        this.window.location = authUrlBase + this.window.location;
     }
 
     // Gets whether or not the user is currently authorized.

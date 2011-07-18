@@ -61,7 +61,7 @@
                 var targetSelector;
 				var lblSelectedCount;
 
-                authProvider = new Batchasa.AuthorizationProvider();
+                authProvider = new Batchasa.AuthorizationProvider(window);
                 picasa = new Batchasa.PicasaService(authProvider);
                 service = new Batchasa.Batchasa(authProvider, picasa);
 
@@ -107,7 +107,7 @@
 					});
 
 					$.ajax({
-						url: 'move.php',
+						url: 'gdata.php',
 						type: 'POST',
 						dataType: 'json',
 						data: data,
